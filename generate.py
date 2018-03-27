@@ -89,7 +89,9 @@ class Category(object):
         self.id = json['additionalInfo']['eventCategories'][0]['categoryId']
         self.path = json['additionalInfo']['eventCategories'][0]['path']
         self.events = [Event.from_id(self.id, ev['id'])
-                       for ev in json['results']]
+                       for ev in json['results'] ]
+        bydate=lambda ev: ev.startDate['date']
+        self.events.sort(reverse=True, key= bydate)
 
 
 class Event(object):
@@ -102,6 +104,8 @@ class Event(object):
         self.data = json['results'][0]
         self.__dict__.update(self.data)
         self.contributions = [Contribution(cn) for cn in self.contributions]
+        bydate=lambda ev: ev.startDate['time']
+        self.contributions.sort(key= bydate)
         if len(self.folders)>0:
             self.attachments=[ Attachment(at) for at in self.folders[0]['attachments'] ]
         self.date=mydate(self.startDate['date'])

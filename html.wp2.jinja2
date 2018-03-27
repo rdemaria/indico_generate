@@ -9,11 +9,12 @@
 {% for event in categ.events %}
   <h4 class="ms-rteElement-H4B" style="font-size: 13px; display: inline;>
   <a href="{{ event.url }}">{{ event.title }}</a> -
-  {{ event.date }} -
-  minutes [{% for at in event.attachments -%}
+  {{ event.date }}
+  {% for at in event.attachments -%}
+  {{ "- minutes " if loop.first -}}
   <a href={{- at.download_url }}>{{- at.short}}</a>
-  {{- ", " if not loop.last }}
-  {%- endfor %}]
+  {{- ", " if not loop.last else "]" }}
+  {%- endfor %}
   </h4>
   <ul>
     {% for cc in event.contributions -%}

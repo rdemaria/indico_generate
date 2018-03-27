@@ -9,23 +9,29 @@
 {% for event in categ.events %}
   <h3>
   <a href="{{ event.url }}">{{ event.title }}</a> -
-  {{ event.date }} -
-  minutes [{% for at in event.attachments -%}
+  {{ event.date }}
+  {% for at in event.attachments -%}
+  {{ "- minutes [" if loop.first -}}
   <a href={{- at.download_url }}>{{- at.short}}</a>
-  {{- ", " if not loop.last }}
-  {%- endfor %}]
+  {{- ", " if not loop.last else "]" }}
+  {%- endfor %}
   </h3>
   <ul>
     {% for cc in event.contributions -%}
       <li><a href="{{ cc.url }}">{{ cc.title }}</a>
-      ({% for sp in cc.speakers -%}
+      {% for sp in cc.speakers -%}
+      {{- "(" if loop.first -}}
       {{- sp['first_name'][0]}}. {{sp['last_name'] }}
-      {{- ", " if not loop.last }}
-      {%- endfor %})
-      [{% for at in cc.attachments -%}
+      {{- ", " if not loop.last else ")" }}
+      {%- endfor %}
+      {% for at in cc.attachments -%}
+      {{- "[" if loop.first -}}
       <a href={{- at.download_url }}>{{- at.short}}</a>
-      {{- ", " if not loop.last }}
-      {%- endfor %}]
+      {{- ", " if not loop.last else "]"}}
+      {%- endfor %}
+      {% if cc.note['url'] is defined %}
+      [<a href={{ cc.note['url']}}>note</a>]
+      {% endif %}
       </li>
     {% endfor %}
   </ul>
