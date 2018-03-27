@@ -1,0 +1,33 @@
+<h2>
+{% for pp in categ.path[-2:-1] -%}
+<a href="{{ pp['url'] }}"> {{pp['name']}} </a>
+{{ "/" if not loop.last }}
+{% endfor %}
+</h2>
+
+
+{% for event in categ.events %}
+  <h3>
+  <a href="{{ event.url }}">{{ event.title }}</a> -
+  {{ event.date }} -
+  minutes [{% for at in event.attachments -%}
+  <a href={{- at.download_url }}>{{- at.short}}</a>
+  {{- ", " if not loop.last }}
+  {%- endfor %}]
+  </h3>
+  <ul>
+    {% for cc in event.contributions -%}
+      <li><a href="{{ cc.url }}">{{ cc.title }}</a>
+      ({% for sp in cc.speakers -%}
+      {{- sp['first_name'][0]}}. {{sp['last_name'] }}
+      {{- ", " if not loop.last }}
+      {%- endfor %})
+      [{% for at in cc.attachments -%}
+      <a href={{- at.download_url }}>{{- at.short}}</a>
+      {{- ", " if not loop.last }}
+      {%- endfor %}]
+      </li>
+    {% endfor %}
+  </ul>
+{% endfor %}
+
