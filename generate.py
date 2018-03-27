@@ -65,20 +65,6 @@ def export_txt(categid):
             print(fmt.format(**contrib))
 
 
-def export_html(categid):
-    out = []
-    catdata = get_category(categid)
-    for event in catdata['results']:
-        fmt = '{startDate[date]}: {title} {url}'
-        print(fmt.format(**event))
-        evdata = get_event(categid, event['id'])
-        for contrib in evdata['results'][0]['contributions']:
-            speakers = ['%s. %s' % (sp['first_name'][0], sp['last_name'])
-                        for sp in contrib['speakers']]
-            fmt = '  {title} (%s)' % (', '.join(speakers))
-            print(fmt.format(**contrib))
-
-
 class Category(object):
     @classmethod
     def from_id(cls, categid):
@@ -142,12 +128,14 @@ def export(categ,tmpfile):
    outfile='%s.%s'%(categ.id,ftype)
    template = jinja2.Template(open(tmpfile).read())
    out=template.render(categ=categ)
-   open(outfile,'w').write(out)
-   print(outfile)
+   print(out)
 
-
-categid=sys.argv[1]
-tmpfile=sys.argv[2]
-categ = Category.from_id(categid)
-export(categ,tmpfile)
+if __name__=="__main__":
+  if len(sys.argv)==3:
+    categid=sys.argv[1]
+    tmpfile=sys.argv[2]
+    categ = Category.from_id(categid)
+    export(categ,tmpfile)
+  else:
+      print("Usage python3 generate.py <categoryid> <templatefile> ><outfile>")
 
