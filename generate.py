@@ -17,14 +17,15 @@ def serve(port=8123):
 
     Handler = http.server.SimpleHTTPRequestHandler
     httpd = socketserver.TCPServer(("", port), Handler)
-    print("serving at http://localhost:%s/"%port)
-    thread = threading.Thread(target = httpd.serve_forever)
+    print("serving at http://localhost:%s/" % port)
+    thread = threading.Thread(target=httpd.serve_forever)
     thread.start()
     return httpd
 
 
 def mydate(dt):
     return datetime.datetime.strptime(dt, '%Y-%m-%d').strftime('%A, %d %B %Y')
+
 
 def get_category(categid):
     jsonfile = 'categ_%s.json' % categid
@@ -75,9 +76,10 @@ class Category(object):
         self.id = json['additionalInfo']['eventCategories'][0]['categoryId']
         self.path = json['additionalInfo']['eventCategories'][0]['path']
         self.events = [Event.from_id(self.id, ev['id'])
-                       for ev in json['results'] ]
-        bydate=lambda ev: ev.startDate['date']
-        self.events.sort(reverse=True, key= bydate)
+                       for ev in json['results']]
+
+        def bydate(ev): return ev.startDate['date']
+        self.events.sort(reverse=True, key=bydate)
 
 
 class Event(object):
@@ -90,11 +92,13 @@ class Event(object):
         self.data = json['results'][0]
         self.__dict__.update(self.data)
         self.contributions = [Contribution(cn) for cn in self.contributions]
-        bydate=lambda ev: ev.startDate['time']
-        self.contributions.sort(key= bydate)
-        if len(self.folders)>0:
-            self.attachments=[ Attachment(at) for at in self.folders[0]['attachments'] ]
-        self.date=mydate(self.startDate['date'])
+
+        def bydate(ev): return ev.startDate['time']
+        self.contributions.sort(key=bydate)
+        if len(self.folders) > 0:
+            self.attachments = [Attachment(at)
+                                for at in self.folders[0]['attachments']]
+        self.date = mydate(self.startDate['date'])
 
 
 class Contribution(object):
@@ -102,40 +106,44 @@ class Contribution(object):
         self.json = json
         self.__dict__.update(self.json)
         self.speakers = [Speaker(sp) for sp in self.speakers]
-        if len(self.folders)>0:
-            self.attachments=[ Attachment(at) for at in self.folders[0]['attachments'] ]
+        if len(self.folders) > 0:
+            self.attachments = [Attachment(at)
+                                for at in self.folders[0]['attachments']]
+
 
 class Speaker(object):
     def __init__(self, json):
         self.json = json
         self.__dict__.update(self.json)
 
+
 class Attachment(object):
     def __init__(self, json):
         self.json = json
         self.__dict__.update(self.json)
-        if self.type=='file':
-           self.short=self.download_url.split('.')[-1]
-        elif self.type=='link':
-           self.short=self.type
+        if self.type == 'file':
+            self.short = self.download_url.split('.')[-1]
+        elif self.type == 'link':
+            self.short = self.type
         else:
-           self.short=self.json
+            self.short = self.json
 
 # export_txt(sys.argv[1])
 
-def export(categ,tmpfile):
-   ftype=tmpfile.split('.')[0]
-   outfile='%s.%s'%(categ.id,ftype)
-   template = jinja2.Template(open(tmpfile).read())
-   out=template.render(categ=categ)
-   print(out)
 
-if __name__=="__main__":
-  if len(sys.argv)==3:
-    categid=sys.argv[1]
-    tmpfile=sys.argv[2]
-    categ = Category.from_id(categid)
-    export(categ,tmpfile)
-  else:
-      print("Usage python3 generate.py <categoryid> <templatefile> ><outfile>")
+def export(categ, tmpfile):
+    ftype = tmpfile.split('.')[0]
+    outfile = '%s.%s' % (categ.id, ftype)
+    template = jinja2.Template(open(tmpfile).read())
+    out = template.render(categ=categ)
+    print(out)
 
+
+if __name__ == "__main__":
+    if len(sys.argv) == 3:
+        categid = sys.argv[1]
+        tmpfile = sys.argv[2]
+        categ = Category.from_id(categid)
+        export(categ, tmpfile)
+    else:
+        print("Usage python3 generate.py <categoryid> <templatefile> ><outfile>")
