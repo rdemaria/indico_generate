@@ -93,7 +93,8 @@ class Event(object):
         self.__dict__.update(self.data)
         self.contributions = [Contribution(cn) for cn in self.contributions]
 
-        def bydate(ev): return ev.startDate['time']
+        def bydate(ev):
+            return ev.startDate['time'] if ev.startDate is not None else ''
         self.contributions.sort(key=bydate)
         if len(self.folders) > 0:
             self.attachments = [Attachment(at)
