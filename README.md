@@ -11,5 +11,6 @@ Examples:
 * [SixTrack](http://htmlpreview.github.io/?https://github.com/rdemaria/indico_generate/blob/master/examples/sixtrack.html)
 * [PLC](http://htmlpreview.github.io/?https://github.com/rdemaria/indico_generate/blob/master/examples/plc.html)
 * [TC](http://htmlpreview.github.io/?https://github.com/rdemaria/indico_generate/blob/master/examples/tc.html)
+* [CB](http://htmlpreview.github.io/?https://github.com/rdemaria/indico_generate/blob/master/examples/cb.html)
 
 
