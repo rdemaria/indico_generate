@@ -1,6 +1,21 @@
+#!/bin/bash
+
+source /cvmfs/sft.cern.ch/lcg/views/LCG_93python3/x86_64-slc6-gcc7-opt/setup.sh
+
+cd /eos/user/r/rdemaria/www/indico_generate
+
+old=`date -u +"%Y-%m-%dT%H:%M:%SZ"`
+
+echo $old
+
+mkdir $old
+mv categ_* examples $old/
+
+mkdir examples
 python3 generate.py 4094 html.wp2.jinja2 >examples/wp2.html
 python3 generate.py 7361 html.jinja2     >examples/tcc.html
 python3 generate.py 6623 html.jinja2     >examples/sixtrack.html
 python3 generate.py 4250 html.jinja2     >examples/tc.html
 python3 generate.py 4018 html.jinja2     >examples/plc.html
 python3 generate.py 4366 html.jinja2     >examples/cb.html
+python3 generate.py 3856 html.jinja2     >examples/wp15.html
