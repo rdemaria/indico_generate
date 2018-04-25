@@ -1,6 +1,0 @@
-python3 generate.py 4094 html.wp2.jinja2 >examples/wp2.html
-python3 generate.py 7361 html.jinja2     >examples/tcc.html
-python3 generate.py 6623 html.jinja2     >examples/sixtrack.html
-python3 generate.py 4250 html.jinja2     >examples/tc.html
-python3 generate.py 4018 html.jinja2     >examples/plc.html
-python3 generate.py 4366 html.jinja2     >examples/cb.html
