@@ -38,12 +38,12 @@ def get_category(categid):
         return resp.json()
 
 
-def get_event(categid, eventid):
+def get_event(categid, eventid, force=False):
     dn = 'categ_%s' % categid
     if not os.path.isdir(dn):
         os.mkdir(dn)
     jsonfile = '%s/event_%s.json' % (dn, eventid)
-    if os.path.isfile(jsonfile):
+    if os.path.isfile(jsonfile) and not force:
         return simplejson.load(open(jsonfile))
     else:
         url = "https://indico.cern.ch/export/event/%s.json" % (eventid)
