@@ -1,3 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>  {{ categ.path[-2]['name'] }}</title>
+</head>
+
+<body>
 <h2>
 {% for pp in categ.path[-2:-1] -%}
 <a href="{{ pp['url'] }}"> {{pp['name']}} </a>
@@ -7,11 +15,11 @@
 
 
 {% for event in categ.events %}
-  <h4 class="ms-rteElement-H4B" style="font-size: 13px; display: inline;>
+  <h4 class="ms-rteElement-H4B" style="font-size: 13px; display: inline;">
   <a href="{{ event.url }}">{{ event.title }}</a> -
   {{ event.date }}
   {% for at in event.attachments -%}
-  {{ "- minutes " if loop.first -}}
+  {{ "- minutes [" if loop.first -}}
   <a href={{- at.download_url }}>{{- at.short}}</a>
   {{- ", " if not loop.last else "]" }}
   {%- endfor %}
@@ -30,9 +38,14 @@
       <a href={{- at.download_url }}>{{- at.short}}</a>
       {{- ", " if not loop.last else "]"}}
       {%- endfor %}
+      {% if cc.note['url'] is defined %}
+      [<a href={{ cc.note['url']}}>note</a>]
+      {% endif %}
       </li>
       {% endif %}
     {% endfor %}
   </ul>
 {% endfor %}
 
+</body>
+</html>

@@ -30,11 +30,13 @@ def mydate(dt):
 def get_category(categid):
     jsonfile = 'categ_%s.json' % categid
     if os.path.isfile(jsonfile):
+        print("Reading %s"%jsonfile)
         return simplejson.load(open(jsonfile))
     else:
         url = "https://indico.cern.ch/export/categ/%s.json" % (categid)
         resp = requests.get(url)
         open(jsonfile, 'w').write(resp.text)
+        print("Writing %s"%jsonfile)
         return resp.json()
 
 
@@ -42,15 +44,16 @@ def get_event(categid, eventid, force=False):
     dn = 'categ_%s' % categid
     if not os.path.isdir(dn):
         os.mkdir(dn)
-    if not force:
-        jsonfile = '%s/event_%s.json' % (dn, eventid)
-        if os.path.isfile(jsonfile):
-             return simplejson.load(open(jsonfile))
+    jsonfile = '%s/event_%s.json' % (dn, eventid)
+    if os.path.isfile(jsonfile) and not force:
+        print("Reading %s"%jsonfile)
+        return simplejson.load(open(jsonfile))
     else:
         url = "https://indico.cern.ch/export/event/%s.json" % (eventid)
         data = {'detail': 'contributions'}
         resp = requests.get(url, data)
         open(jsonfile, 'w').write(resp.text)
+        print("Writing %s"%jsonfile)
         return resp.json()
 
 
@@ -76,17 +79,21 @@ class Category(object):
         self.json = json
         self.id = json['additionalInfo']['eventCategories'][0]['categoryId']
         self.path = json['additionalInfo']['eventCategories'][0]['path']
-        self.events = [Event.from_id(self.id, ev['id'])
-                       for ev in json['results']]
-
+        refresh = time.strftime("%Y-%m-%d",time.localtime(time.time()-30*24*3600))
+        self.events=[]
+        for ev in  json['results']:
+            if ev['startDate']['date']>refresh:
+                self.events.append(Event.from_id(self.id, ev['id'],force=True))
+            else:
+                self.events.append(Event.from_id(self.id, ev['id'],force=False))
         def bydate(ev): return ev.startDate['date']
         self.events.sort(reverse=True, key=bydate)
 
 
 class Event(object):
     @classmethod
-    def from_id(cls, categid, eventid):
-        return cls(get_event(categid, eventid))
+    def from_id(cls, categid, eventid, force=False):
+        return cls(get_event(categid, eventid, force=force))
 
     def __init__(self, json):
         self.json = json
@@ -133,19 +140,19 @@ class Attachment(object):
 # export_txt(sys.argv[1])
 
 
-def export(categ, tmpfile):
-    ftype = tmpfile.split('.')[0]
-    outfile = '%s.%s' % (categ.id, ftype)
+def export(categ, tmpfile,outfile):
     template = jinja2.Template(open(tmpfile).read())
     out = template.render(categ=categ)
-    print(out)
+    open(outfile,'w').write(out)
+    print("writing %s"%outfile)
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 3:
+    if len(sys.argv) == 4:
         categid = sys.argv[1]
         tmpfile = sys.argv[2]
+        outfile = sys.argv[3]
         categ = Category.from_id(categid)
-        export(categ, tmpfile)
+        export(categ, tmpfile,outfile)
     else:
-        print("Usage python3 generate.py <categoryid> <templatefile> ><outfile>")
+        print("Usage python3 generate.py <categoryid> <templatefile> <outfile>")
